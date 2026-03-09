@@ -484,9 +484,3 @@ Auto-create incident ticket
 
 # 
 ---
-
-If you want, I can also give you:
-
-• **SOC Interview Questions from this topic (very useful for SOC L1 jobs)**
-• **Practical lab tasks based on this theory**
-• **Real SOC alert examples for practice**.
